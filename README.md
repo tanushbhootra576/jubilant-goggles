@@ -24,19 +24,19 @@ Kavach-City AI is a full-stack urban intelligence dashboard that simulates, moni
 
 ## Features
 
-| Module | Description |
-|--------|-------------|
-| **Live Dashboard** | Real-time ward sensor streaming via Socket.io — 10 wards, 5-second refresh |
-| **Predictive Digital Twin** | Moving-average trend forecasting per resource with slope analysis |
-| **Disaster Simulation** | Toggle power outage, flood, traffic jam, or pipeline burst scenarios |
-| **City Health Index** | Weighted KPI score (0–100) aggregating all ward resource states |
-| **Historical Replay** | Replay any 30-minute window of sensor readings from MongoDB |
-| **AI Tactical Reasoning** | Ward-level emergency plans via Featherless AI (Qwen3-VL-30B), with structured JSON output and local fallback |
-| **Infrastructure Analytics** | City-wide utilization, zone comparison charts, 24h/7d forecasts, hotspot map |
+| Module                         | Description                                                                                                              |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| **Live Dashboard**             | Real-time ward sensor streaming via Socket.io — 10 wards, 5-second refresh                                               |
+| **Predictive Digital Twin**    | Moving-average trend forecasting per resource with slope analysis                                                        |
+| **Disaster Simulation**        | Toggle power outage, flood, traffic jam, or pipeline burst scenarios                                                     |
+| **City Health Index**          | Weighted KPI score (0–100) aggregating all ward resource states                                                          |
+| **Historical Replay**          | Replay any 30-minute window of sensor readings from MongoDB                                                              |
+| **AI Tactical Reasoning**      | Ward-level emergency plans via Featherless AI (Qwen3-VL-30B), with structured JSON output and local fallback             |
+| **Infrastructure Analytics**   | City-wide utilization, zone comparison charts, 24h/7d forecasts, hotspot map                                             |
 | **Budget Allocation Analysis** | Per-ward budget vs. demand analysis, sector funding breakdown, underfunding detection, AI redistribution recommendations |
-| **Congestion Alerts** | Resource-level alert feed (Overloaded / Congested) with severity badges |
-| **Ward → Command Center** | Click any ward in Analytics to deep-link it into the Dashboard with full detail panel |
-| **Glassmorphism UI** | Light-theme glassmorphism design — refined slate/indigo palette, no rainbow |
+| **Congestion Alerts**          | Resource-level alert feed (Overloaded / Congested) with severity badges                                                  |
+| **Ward → Command Center**      | Click any ward in Analytics to deep-link it into the Dashboard with full detail panel                                    |
+| **Glassmorphism UI**           | Light-theme glassmorphism design — refined slate/indigo palette, no rainbow                                              |
 
 ---
 
@@ -84,25 +84,27 @@ Kavach-City AI is a full-stack urban intelligence dashboard that simulates, moni
 ## Tech Stack
 
 ### Frontend
-| Library | Version | Purpose |
-|---------|---------|---------|
-| React | 18 | UI framework |
-| Vite | 5 | Build tool & dev server |
-| React Router DOM | 7 | Client-side routing (6 routes) |
-| Framer Motion | 12 | Page & component animations |
-| Recharts | 3 | Bar, Line, Pie charts |
-| Leaflet | 1.9 | Interactive ward hotspot map |
-| Socket.io-client | 4.7 | Live sensor stream |
+
+| Library          | Version | Purpose                        |
+| ---------------- | ------- | ------------------------------ |
+| React            | 18      | UI framework                   |
+| Vite             | 5       | Build tool & dev server        |
+| React Router DOM | 7       | Client-side routing (6 routes) |
+| Framer Motion    | 12      | Page & component animations    |
+| Recharts         | 3       | Bar, Line, Pie charts          |
+| Leaflet          | 1.9     | Interactive ward hotspot map   |
+| Socket.io-client | 4.7     | Live sensor stream             |
 
 ### Backend
-| Library | Version | Purpose |
-|---------|---------|---------|
-| Express | 4.18 | HTTP server & REST API |
-| Socket.io | 4.7 | Real-time bidirectional events |
-| Mongoose | 7 | MongoDB ODM |
-| Axios | 1.4 | Featherless AI HTTP calls |
-| dotenv | 16 | Environment variable loading |
-| nodemon | — | Dev auto-restart |
+
+| Library   | Version | Purpose                        |
+| --------- | ------- | ------------------------------ |
+| Express   | 4.18    | HTTP server & REST API         |
+| Socket.io | 4.7     | Real-time bidirectional events |
+| Mongoose  | 7       | MongoDB ODM                    |
+| Axios     | 1.4     | Featherless AI HTTP calls      |
+| dotenv    | 16      | Environment variable loading   |
+| nodemon   | —       | Dev auto-restart               |
 
 ---
 
@@ -168,6 +170,7 @@ Round2/
 ## Installation
 
 ### Prerequisites
+
 - Node.js ≥ 18
 - MongoDB running locally on port 27017 (or a MongoDB Atlas URI)
 - A Featherless AI API key (optional — local fallback works without it)
@@ -191,6 +194,7 @@ npm install
 ### 2. Configure environment variables
 
 **`backend/.env`**
+
 ```env
 MONGODB_URI=mongodb://localhost:27017/
 PORT=4000
@@ -200,6 +204,7 @@ LLM_MODEL=Qwen/Qwen3-VL-30B-A3B-Instruct
 ```
 
 **`frontend/.env`**
+
 ```env
 VITE_API_URL=http://localhost:4000
 ```
@@ -211,6 +216,7 @@ VITE_API_URL=http://localhost:4000
 Open **two terminals**:
 
 **Terminal 1 — Backend**
+
 ```bash
 cd Round2/backend
 npm run dev          # nodemon auto-restart
@@ -219,6 +225,7 @@ npm start            # plain node
 ```
 
 **Terminal 2 — Frontend**
+
 ```bash
 cd Round2/frontend
 npm run dev          # Vite dev server → http://localhost:5173
@@ -227,6 +234,7 @@ npm run dev          # Vite dev server → http://localhost:5173
 Then open **http://localhost:5173** in your browser.
 
 > If port 4000 is already in use on Windows, run:
+>
 > ```powershell
 > Get-NetTCPConnection -LocalPort 4000 | Select-Object -ExpandProperty OwningProcess | ForEach-Object { Stop-Process -Id $_ -Force }
 > ```
@@ -235,14 +243,14 @@ Then open **http://localhost:5173** in your browser.
 
 ## Environment Variables
 
-| Variable | Location | Required | Description |
-|----------|----------|----------|-------------|
-| `MONGODB_URI` | backend/.env | Yes | MongoDB connection string |
-| `PORT` | backend/.env | No | Backend port (default: 4000) |
-| `LLM_API_KEY` | backend/.env | No | Featherless AI key — enables real AI responses |
-| `LLM_BASE_URL` | backend/.env | No | Featherless base URL (default: `https://api.featherless.ai/v1`) |
-| `LLM_MODEL` | backend/.env | No | Model ID (default: `Qwen/Qwen3-VL-30B-A3B-Instruct`) |
-| `VITE_API_URL` | frontend/.env | No | Backend base URL (default: `http://localhost:4000`) |
+| Variable       | Location      | Required | Description                                                     |
+| -------------- | ------------- | -------- | --------------------------------------------------------------- |
+| `MONGODB_URI`  | backend/.env  | Yes      | MongoDB connection string                                       |
+| `PORT`         | backend/.env  | No       | Backend port (default: 4000)                                    |
+| `LLM_API_KEY`  | backend/.env  | No       | Featherless AI key — enables real AI responses                  |
+| `LLM_BASE_URL` | backend/.env  | No       | Featherless base URL (default: `https://api.featherless.ai/v1`) |
+| `LLM_MODEL`    | backend/.env  | No       | Model ID (default: `Qwen/Qwen3-VL-30B-A3B-Instruct`)            |
+| `VITE_API_URL` | frontend/.env | No       | Backend base URL (default: `http://localhost:4000`)             |
 
 ---
 
@@ -250,35 +258,35 @@ Then open **http://localhost:5173** in your browser.
 
 ### Core
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/wards` | All 10 ward documents from MongoDB |
-| `GET` | `/api/history?minutes=30` | Sensor reading history (default 30 min) |
+| Method | Endpoint                  | Description                             |
+| ------ | ------------------------- | --------------------------------------- |
+| `GET`  | `/api/wards`              | All 10 ward documents from MongoDB      |
+| `GET`  | `/api/history?minutes=30` | Sensor reading history (default 30 min) |
 
 ### Analytics
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/analytics` | Full analytics computation: utilization, zones, forecasts, alerts, recommendations |
-| `GET` | `/api/budget` | Ward-wise budget allocation, demand vs. budget gap, sector totals, underfunded wards, ranking |
+| Method | Endpoint         | Description                                                                                   |
+| ------ | ---------------- | --------------------------------------------------------------------------------------------- |
+| `GET`  | `/api/analytics` | Full analytics computation: utilization, zones, forecasts, alerts, recommendations            |
+| `GET`  | `/api/budget`    | Ward-wise budget allocation, demand vs. budget gap, sector totals, underfunded wards, ranking |
 
 ### AI
 
-| Method | Endpoint | Body | Description |
-|--------|----------|------|-------------|
-| `GET` | `/api/ai?wardId=W-1` | — | Ward-level emergency plan (Featherless or local fallback) |
-| `POST` | `/api/ai/city` | `{ cityAvg, hotspots, alerts }` | City-wide AI risk assessment |
-| `POST` | `/api/ai/budget` | `{ budgetAnalysis }` | AI-powered budget redistribution recommendations |
+| Method | Endpoint             | Body                            | Description                                               |
+| ------ | -------------------- | ------------------------------- | --------------------------------------------------------- |
+| `GET`  | `/api/ai?wardId=W-1` | —                               | Ward-level emergency plan (Featherless or local fallback) |
+| `POST` | `/api/ai/city`       | `{ cityAvg, hotspots, alerts }` | City-wide AI risk assessment                              |
+| `POST` | `/api/ai/budget`     | `{ budgetAnalysis }`            | AI-powered budget redistribution recommendations          |
 
 ### Socket.io Events
 
-| Event | Direction | Payload |
-|-------|-----------|---------|
-| `sensors:bulk` | Server → Client | `{ timestamp, wards[] }` — full ward state every 5s |
-| `ai:analysis` | Server → Client | `{ wardId, ai }` — triggered when utilization > 90% |
-| `disaster:set` | Client → Server | `{ enabled, scenario }` — toggle disaster mode |
-| `replay:start` | Client → Server | `{ minutes }` — request historical frames |
-| `replay:frames` | Server → Client | Array of SensorReading documents |
+| Event           | Direction       | Payload                                             |
+| --------------- | --------------- | --------------------------------------------------- |
+| `sensors:bulk`  | Server → Client | `{ timestamp, wards[] }` — full ward state every 5s |
+| `ai:analysis`   | Server → Client | `{ wardId, ai }` — triggered when utilization > 90% |
+| `disaster:set`  | Client → Server | `{ enabled, scenario }` — toggle disaster mode      |
+| `replay:start`  | Client → Server | `{ minutes }` — request historical frames           |
+| `replay:frames` | Server → Client | Array of SensorReading documents                    |
 
 ---
 
@@ -287,6 +295,7 @@ Then open **http://localhost:5173** in your browser.
 The `AIService` calls the Featherless AI OpenAI-compatible `/chat/completions` endpoint with a structured system prompt. It gracefully falls back to deterministic heuristics when no API key is set or the call fails.
 
 ### Ward Emergency Plan Response
+
 ```json
 {
   "severity": 85,
@@ -308,11 +317,16 @@ The `AIService` calls the Featherless AI OpenAI-compatible `/chat/completions` e
 ```
 
 ### City AI Insights Response
+
 ```json
 {
   "cityStatus": "Warning",
   "headline": "Central zone power grid at 94% city-wide average — risk of cascade failure.",
-  "top_actions": ["Pre-emptive demand management", "Activate reserve capacity", "Monitor adjacent zones"],
+  "top_actions": [
+    "Pre-emptive demand management",
+    "Activate reserve capacity",
+    "Monitor adjacent zones"
+  ],
   "risk_score": 67,
   "insight": "Weekly pattern shows Friday peaks historically 12% above Thursday baseline.",
   "source": "featherless-ai"
@@ -351,7 +365,6 @@ The budget module models each ward's infrastructure spending across 6 sectors an
 ## License
 
 MIT — built for the Kavach Smart City AI hackathon.
-
 
 ## Project Overview
 
