@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import MapView from '../components/MapView';
 import WardPanel from '../components/WardPanel';
 import HealthIndex from '../components/HealthIndex';
@@ -13,6 +14,17 @@ export default function Dashboard() {
     const [wards, setWards] = useState([]);
     const [disasterMode, setDisasterMode] = useState(false);
     const [ai, setAi] = useState(null);
+    const [selectedWard, setSelectedWard] = useState(null);
+    const location = useLocation();
+
+    // Pre-select ward passed from Analytics page
+    useEffect(() => {
+        if (location.state?.selectedWard) {
+            setSelectedWard(location.state.selectedWard);
+            // Clear the state so back-navigation doesn't re-trigger
+            window.history.replaceState({}, '');
+        }
+    }, [location.state]);
 
     useEffect(() => {
         socket.on('sensors:bulk', ({ wards: latest }) => {
@@ -46,7 +58,7 @@ export default function Dashboard() {
                 }}
             >
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <WardPanel wards={wards} />
+                    <WardPanel wards={wards} selectedWard={selectedWard} onSelect={setSelectedWard} />
                     <DisasterToggle />
                     <ReplayPanel />
                 </div>

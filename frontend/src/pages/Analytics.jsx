@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../layouts/DashboardLayout';
 import GlassCard from '../components/GlassCard';
 import UtilizationGrid from '../components/analytics/UtilizationGrid';
@@ -38,6 +39,11 @@ export default function Analytics() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [lastUpdated, setLastUpdated] = useState(null);
+    const navigate = useNavigate();
+
+    const handleWardSelect = (ward) => {
+        navigate('/dashboard', { state: { selectedWard: ward } });
+    };
 
     const fetchAnalytics = useCallback(async () => {
         try {
@@ -165,7 +171,7 @@ export default function Analytics() {
 
                 {/* Row 4: Full ward utilization grid */}
                 <div>
-                    <UtilizationGrid wardAnalytics={wardAnalytics} />
+                    <UtilizationGrid wardAnalytics={wardAnalytics} onWardSelect={handleWardSelect} />
                 </div>
 
                 <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.72rem', color: 'var(--text-secondary)' }}>

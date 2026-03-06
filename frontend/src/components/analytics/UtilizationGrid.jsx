@@ -33,7 +33,7 @@ function UtilBar({ pct, resource }) {
     );
 }
 
-export default function UtilizationGrid({ wardAnalytics = [] }) {
+export default function UtilizationGrid({ wardAnalytics = [], onWardSelect }) {
     const [filter, setFilter] = useState('All');
     const [sortBy, setSortBy] = useState('avgPct');
     const [page, setPage] = useState(0);
@@ -73,7 +73,11 @@ export default function UtilizationGrid({ wardAnalytics = [] }) {
                 {paged.map(w => {
                     const borderColor = STATUS_COLOR[w.overallStatus];
                     return (
-                        <div key={w.wardId} style={{ background: 'rgba(255,255,255,0.6)', borderRadius: 10, padding: '0.8rem', border: `2px solid ${borderColor}22`, borderLeft: `4px solid ${borderColor}` }}>
+                        <div key={w.wardId}
+                            onClick={() => onWardSelect && onWardSelect(w)}
+                            style={{ background: 'rgba(255,255,255,0.6)', borderRadius: 10, padding: '0.8rem', border: `2px solid ${borderColor}22`, borderLeft: `4px solid ${borderColor}`, cursor: onWardSelect ? 'pointer' : 'default', transition: 'transform 0.15s, box-shadow 0.15s' }}
+                            onMouseEnter={e => { if (onWardSelect) { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.1)'; } }}
+                            onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                                 <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>{w.name}</span>
                                 <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'white', background: borderColor, padding: '2px 7px', borderRadius: 12 }}>{w.overallStatus}</span>
@@ -84,6 +88,12 @@ export default function UtilizationGrid({ wardAnalytics = [] }) {
                             {Object.entries(w.util).map(([res, u]) => (
                                 <UtilBar key={res} pct={u.pct} resource={res} />
                             ))}
+                            {onWardSelect && (
+                                <div style={{ marginTop: '0.5rem', paddingTop: '0.4rem', borderTop: '1px solid rgba(0,0,0,0.06)', fontSize: '0.7rem', color: 'var(--accent-light, #3b82f6)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                    View in Command Center
+                                </div>
+                            )}
                         </div>
                     );
                 })}
