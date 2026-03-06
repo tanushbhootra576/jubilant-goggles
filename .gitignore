@@ -1,0 +1,33 @@
+# Root .gitignore for Kavach-City-AI
+
+# Node modules (root-level if any)
+node_modules/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Build output
+dist/
+build/
+
+# Ignore subfolder node_modules (backend/frontend)
+/backend/node_modules/
+/frontend/node_modules/
+
+# Ignore local lockfile if present at root (workspace uses per-package lockfiles)
+package-lock.json
