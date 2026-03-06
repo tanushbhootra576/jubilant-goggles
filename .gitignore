@@ -4,8 +4,6 @@
 node_modules/
 
 # Environment files
-.env
-.env.local
 .env.*.local
 
 # Logs
@@ -31,3 +29,6 @@ build/
 
 # Ignore local lockfile if present at root (workspace uses per-package lockfiles)
 package-lock.json
+config.bat
+temp_auto_push.bat
+temp_interactive_push.bat
