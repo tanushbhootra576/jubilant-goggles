@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import GlassCard from '../GlassCard';
 
 const STATUS_COLOR = {
-    Underutilized: '#3b82f6',
-    Optimal: '#22c55e',
-    Congested: '#f59e0b',
-    Overloaded: '#ef4444'
+    Underutilized: '#1e40af',
+    Optimal: '#15803d',
+    Congested: '#b45309',
+    Overloaded: '#b91c1c'
 };
 
 const RESOURCE_ICONS = {

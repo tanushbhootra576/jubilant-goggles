@@ -6,8 +6,12 @@ import {
 } from 'recharts';
 
 const RESOURCE_COLORS = {
-    power: '#f59e0b', water: '#3b82f6', traffic: '#8b5cf6',
-    parking: '#06b6d4', waste: '#84cc16', transit: '#f97316'
+    power: '#1e40af',
+    water: '#0e7490',
+    traffic: '#6d28d9',
+    parking: '#0369a1',
+    waste: '#065f46',
+    transit: '#7c3aed'
 };
 
 const LABELS = {
@@ -74,8 +78,8 @@ export default function ForecastChart({ forecast24h = [], forecast7d = [] }) {
             {/* Peak hours label */}
             {view === '24h' && (
                 <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: '0.72rem', background: '#fee2e2', color: '#ef4444', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>Red dashes = 100% rated capacity</span>
-                    <span style={{ fontSize: '0.72rem', background: '#fef3c7', color: '#d97706', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>Yellow dashes = 80% congestion threshold</span>
+                    <span style={{ fontSize: '0.72rem', background: 'rgba(185,28,28,0.08)', color: '#b91c1c', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>Red dashes = 100% rated capacity</span>
+                    <span style={{ fontSize: '0.72rem', background: 'rgba(180,83,9,0.08)', color: '#b45309', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>Yellow dashes = 80% congestion threshold</span>
                 </div>
             )}
         </GlassCard>

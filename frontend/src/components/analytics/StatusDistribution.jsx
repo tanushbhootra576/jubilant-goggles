@@ -3,10 +3,10 @@ import GlassCard from '../GlassCard';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const STATUS_COLORS = {
-    Overloaded: '#ef4444',
-    Congested: '#f59e0b',
-    Optimal: '#22c55e',
-    Underutilized: '#3b82f6'
+    Overloaded: '#b91c1c',
+    Congested: '#b45309',
+    Optimal: '#15803d',
+    Underutilized: '#1e40af'
 };
 
 const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, value, name }) => {

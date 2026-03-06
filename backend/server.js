@@ -241,14 +241,152 @@ async function start() {
             }
         });
 
+        // ── AI City Analytics ──────────────────────────────────────────
+        app.post('/api/ai/city', async (req, res) => {
+            try {
+                const { cityAvg, hotspots, alerts } = req.body || {};
+                if (!cityAvg) return res.status(400).json({ ok: false, message: 'cityAvg required' });
+                const result = await AIService.analyseAnalytics({ cityAvg, hotspots, alerts });
+                return res.json({ ok: true, analysis: result });
+            } catch (err) {
+                console.error('ai/city error', err);
+                res.status(500).json({ ok: false, message: 'AI city analysis failed' });
+            }
+        });
+        // -- Budget Allocation Analysis --------------------------------
+        app.get('/api/budget', async (req, res) => {
+            try {
+                const wards = await Ward.find().lean();
+                if (!wards.length) return res.json({ ok: true, budget: null });
+
+                const sectors = ['power', 'water', 'traffic', 'parking', 'waste', 'transit'];
+                const budgetKey = { power: 'budgetPower', water: 'budgetWater', traffic: 'budgetTraffic', parking: 'budgetParking', waste: 'budgetWaste', transit: 'budgetTransit' };
+                const spendKey = { power: 'spendPower', water: 'spendWater', traffic: 'spendTraffic', parking: 'spendParking', waste: 'spendWaste', transit: 'spendTransit' };
+                const capKey = { power: 'powerCapacity', water: 'waterCapacity', traffic: 'trafficCapacity', parking: 'parkingCapacity', waste: 'wasteCapacity', transit: 'transitCapacity' };
+                const useKey = { power: 'power', water: 'water', traffic: 'traffic', parking: 'parking', waste: 'waste', transit: 'transit' };
+
+                // Per-ward budget detail
+                const wardBudgets = wards.map(w => {
+                    const sectorDetail = {};
+                    let totalSpend = 0;
+                    sectors.forEach(s => {
+                        const alloc = w[budgetKey[s]] || 0;
+                        const spend = w[spendKey[s]] || 0;
+                        const utilPct = Math.round(((w[useKey[s]] || 0) / (w[capKey[s]] || 100)) * 100);
+                        // Demand estimation: if utilisation > 80%, demand ≈ spend * (utilPct/70)
+                        const demandCr = utilPct > 80
+                            ? parseFloat((spend * (utilPct / 70)).toFixed(2))
+                            : spend;
+                        const deficitCr = parseFloat(Math.max(0, demandCr - alloc).toFixed(2));
+                        totalSpend += spend;
+                        sectorDetail[s] = {
+                            allocated: alloc,
+                            spent: spend,
+                            usagePct: utilPct,
+                            demandCr,
+                            deficitCr,
+                            efficiency: alloc > 0 ? parseFloat((utilPct / (spend / alloc * 100) * 100).toFixed(1)) : 0,
+                            status: deficitCr > 0 ? 'Underfunded' : utilPct < 40 ? 'Surplus' : 'Adequate'
+                        };
+                    });
+                    const totalAlloc = w.totalBudget || 0;
+                    const overallUtil = Math.round(sectors.reduce((s, r) => s + ((w[useKey[r]] || 0) / (w[capKey[r]] || 100)) * 100, 0) / sectors.length);
+                    const totalDemand = parseFloat(sectors.reduce((s, k) => s + sectorDetail[k].demandCr, 0).toFixed(2));
+                    const totalDeficit = parseFloat(Math.max(0, totalDemand - totalAlloc).toFixed(2));
+                    return {
+                        wardId: w.wardId, name: w.name, zone: w.zone,
+                        totalBudget: totalAlloc,
+                        totalSpent: parseFloat(totalSpend.toFixed(2)),
+                        totalDemand,
+                        deficitCr: totalDeficit,
+                        surplusCr: parseFloat(Math.max(0, totalAlloc - totalDemand).toFixed(2)),
+                        overallUtil,
+                        spendRate: totalAlloc > 0 ? parseFloat((totalSpend / totalAlloc * 100).toFixed(1)) : 0,
+                        isUnderfunded: totalDeficit > 0,
+                        sectors: sectorDetail
+                    };
+                });
+
+                // City-wide sector totals
+                const sectorTotals = {};
+                const sectorSpend = {};
+                sectors.forEach(s => {
+                    sectorTotals[s] = parseFloat(wardBudgets.reduce((sum, w) => sum + (w.sectors[s]?.allocated || 0), 0).toFixed(2));
+                    sectorSpend[s] = parseFloat(wardBudgets.reduce((sum, w) => sum + (w.sectors[s]?.spent || 0), 0).toFixed(2));
+                });
+                const cityTotal = parseFloat(wardBudgets.reduce((s, w) => s + w.totalBudget, 0).toFixed(2));
+                const citySpend = parseFloat(wardBudgets.reduce((s, w) => s + w.totalSpent, 0).toFixed(2));
+
+                // Rankings
+                const topBudget = [...wardBudgets].sort((a, b) => b.totalBudget - a.totalBudget);
+                const topUtilisation = [...wardBudgets].sort((a, b) => b.overallUtil - a.overallUtil);
+                const topEfficiency = [...wardBudgets].sort((a, b) => (b.overallUtil / (b.totalBudget || 1)) - (a.overallUtil / (a.totalBudget || 1)));
+                const underfunded = wardBudgets.filter(w => w.isUnderfunded).sort((a, b) => b.deficitCr - a.deficitCr);
+                const surplus = wardBudgets.filter(w => !w.isUnderfunded && w.surplusCr > 0).sort((a, b) => b.surplusCr - a.surplusCr);
+
+                // Top funded sector
+                const topSector = Object.entries(sectorTotals).sort((a, b) => b[1] - a[1])[0]?.[0];
+
+                // Zone aggregates
+                const zoneMap = {};
+                wardBudgets.forEach(w => {
+                    if (!zoneMap[w.zone]) zoneMap[w.zone] = { zone: w.zone, wardCount: 0, totalBudget: 0, totalSpent: 0, totalDeficit: 0, avgUtil: 0 };
+                    zoneMap[w.zone].wardCount++;
+                    zoneMap[w.zone].totalBudget += w.totalBudget;
+                    zoneMap[w.zone].totalSpent += w.totalSpent;
+                    zoneMap[w.zone].totalDeficit += w.deficitCr;
+                    zoneMap[w.zone].avgUtil += w.overallUtil;
+                });
+                const zoneSummary = Object.values(zoneMap).map(z => ({
+                    ...z,
+                    totalBudget: parseFloat(z.totalBudget.toFixed(2)),
+                    totalSpent: parseFloat(z.totalSpent.toFixed(2)),
+                    totalDeficit: parseFloat(z.totalDeficit.toFixed(2)),
+                    avgUtil: Math.round(z.avgUtil / z.wardCount)
+                })).sort((a, b) => b.totalBudget - a.totalBudget);
+
+                return res.json({
+                    ok: true,
+                    budget: {
+                        wardBudgets,
+                        sectorTotals,
+                        sectorSpend,
+                        cityTotal,
+                        citySpend,
+                        topSector,
+                        topBudget,
+                        topUtilisation,
+                        topEfficiency,
+                        underfunded,
+                        surplus,
+                        zoneSummary,
+                        generatedAt: new Date()
+                    }
+                });
+            } catch (err) {
+                console.error('budget error', err);
+                res.status(500).json({ ok: false, message: 'Budget analysis failed' });
+            }
+        });
+
+        app.post('/api/ai/budget', async (req, res) => {
+            try {
+                const { wards, cityTotals, underfunded, topBudget, sectorTotals } = req.body || {};
+                const result = await AIService.analyseBudget({ wards, cityTotals, underfunded, topBudget, sectorTotals });
+                return res.json({ ok: true, analysis: result });
+            } catch (err) {
+                console.error('ai/budget error', err);
+                res.status(500).json({ ok: false, message: 'AI budget analysis failed' });
+            }
+        });
         const PORT = process.env.PORT || 4000;
-        server.listen(PORT, () => console.log('Server listening on', PORT)).on('error', (e) => {
+        server.listen(PORT, () => console.log(`Server listening on port ${PORT}`)).on('error', (e) => {
             if (e.code === 'EADDRINUSE') {
-                console.error(`Port ${PORT} is in use, retrying...`);
-                setTimeout(() => {
-                    server.close();
-                    server.listen(PORT);
-                }, 1000);
+                console.error(`Port ${PORT} is already in use. Kill the process using it and restart.`);
+                process.exit(1);
+            } else {
+                console.error('Server error:', e);
+                process.exit(1);
             }
         });
     } catch (err) {

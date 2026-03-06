@@ -7,8 +7,32 @@ let disaster = { enabled: false, scenario: null };
 const ZONES = ['North', 'South', 'East', 'West', 'Central'];
 const ZONE_FACTOR = { North: 0.55, South: 0.70, East: 0.85, West: 0.45, Central: 0.95 };
 
+// Zone-based total budget multiplier (Crore INR base = 50)
+const ZONE_BUDGET = { Central: 1.4, East: 1.15, South: 1.05, North: 0.85, West: 0.70 };
+
+// Sector budget weight distribution (must sum to 1)
+const SECTOR_WEIGHTS = {
+    power: 0.25, water: 0.22, traffic: 0.20,
+    parking: 0.12, waste: 0.11, transit: 0.10
+};
+
 function randomBetween(a, b) { return Math.random() * (b - a) + a; }
 function clamp(v, max = 130) { return Math.max(0, Math.min(max, v)); }
+function round2(v) { return Math.round(v * 100) / 100; }
+
+function allocateBudget(zone, wardIndex) {
+    // Base budget 40-80 Cr, scaled by zone importance + small random variance
+    const base = 40 + wardIndex * 4;
+    const total = round2(base * (ZONE_BUDGET[zone] || 1.0) * randomBetween(0.9, 1.1));
+    const sectors = {};
+    const keys = Object.keys(SECTOR_WEIGHTS);
+    keys.forEach(k => {
+        // Small random deviation (+/-15%) around the canonical weight
+        const weight = SECTOR_WEIGHTS[k] * randomBetween(0.85, 1.15);
+        sectors[k] = round2(total * weight);
+    });
+    return { total, ...sectors };
+}
 
 function createWards(count = 10) {
     const wards = [];
@@ -18,6 +42,7 @@ function createWards(count = 10) {
         const cap = () => Math.round(randomBetween(60, 100));
         const use = (c) => clamp(c * f + randomBetween(-10, 10));
         const pC = cap(), wC = cap(), tC = cap(), pkC = cap(), wsC = cap(), trC = cap();
+        const budget = allocateBudget(zone, i);
         wards.push({
             wardId: `W-${i + 1}`,
             name: `Ward ${i + 1}`,
@@ -29,7 +54,18 @@ function createWards(count = 10) {
             powerCapacity: pC, waterCapacity: wC, trafficCapacity: tC,
             parkingCapacity: pkC, wasteCapacity: wsC, transitCapacity: trC,
             power: use(pC), water: use(wC), traffic: use(tC),
-            parking: use(pkC), waste: use(wsC), transit: use(trC)
+            parking: use(pkC), waste: use(wsC), transit: use(trC),
+            // Budget (Crore INR)
+            totalBudget: budget.total,
+            budgetPower: budget.power, budgetWater: budget.water, budgetTraffic: budget.traffic,
+            budgetParking: budget.parking, budgetWaste: budget.waste, budgetTransit: budget.transit,
+            // Initial spend = proportional to current utilisation
+            spendPower: round2(budget.power * randomBetween(0.55, 0.95)),
+            spendWater: round2(budget.water * randomBetween(0.55, 0.95)),
+            spendTraffic: round2(budget.traffic * randomBetween(0.55, 0.95)),
+            spendParking: round2(budget.parking * randomBetween(0.40, 0.90)),
+            spendWaste: round2(budget.waste * randomBetween(0.40, 0.90)),
+            spendTransit: round2(budget.transit * randomBetween(0.40, 0.90))
         });
     }
     return wards;
@@ -93,7 +129,16 @@ async function start({ io, PredictionService, AIService, Ward: WardModel, Sensor
             })));
 
             await Promise.all(wards.map(w =>
-                WardModel.updateOne({ wardId: w.wardId }, { $set: { ...w, updatedAt: new Date() } }, { upsert: true })
+                WardModel.updateOne({ wardId: w.wardId }, {
+                    $set: {
+                        ...w,
+                        // Slowly drift spend up when utilisation is high
+                        spendPower: round2(Math.min(w.budgetPower, w.spendPower + (w.power > w.powerCapacity * 0.85 ? 0.05 : 0))),
+                        spendWater: round2(Math.min(w.budgetWater, w.spendWater + (w.water > w.waterCapacity * 0.85 ? 0.04 : 0))),
+                        spendTraffic: round2(Math.min(w.budgetTraffic, w.spendTraffic + (w.traffic > w.trafficCapacity * 0.85 ? 0.06 : 0))),
+                        updatedAt: new Date()
+                    }
+                }, { upsert: true })
             ));
 
             io.emit('sensors:bulk', { timestamp, wards });

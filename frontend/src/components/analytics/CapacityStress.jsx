@@ -6,15 +6,19 @@ import {
 } from 'recharts';
 
 const RESOURCE_COLORS = {
-    power: '#f59e0b', water: '#3b82f6', traffic: '#8b5cf6',
-    parking: '#06b6d4', waste: '#84cc16', transit: '#f97316'
+    power: '#1e40af',
+    water: '#0e7490',
+    traffic: '#6d28d9',
+    parking: '#0369a1',
+    waste: '#065f46',
+    transit: '#7c3aed'
 };
 
 function getColor(avg) {
-    if (avg > 100) return '#ef4444';
-    if (avg > 80) return '#f59e0b';
-    if (avg > 40) return '#22c55e';
-    return '#3b82f6';
+    if (avg > 100) return '#b91c1c';
+    if (avg > 80) return '#b45309';
+    if (avg > 40) return '#15803d';
+    return '#1e40af';
 }
 
 const CustomTooltip = ({ active, payload, label }) => {

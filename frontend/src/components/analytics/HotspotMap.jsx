@@ -4,10 +4,10 @@ import 'leaflet/dist/leaflet.css';
 import GlassCard from '../GlassCard';
 
 const STATUS_COLOR = {
-    Overloaded: '#ef4444',
-    Congested: '#f59e0b',
-    Optimal: '#22c55e',
-    Underutilized: '#3b82f6'
+    Overloaded: '#b91c1c',
+    Congested: '#b45309',
+    Optimal: '#15803d',
+    Underutilized: '#1e40af'
 };
 
 export default function HotspotMap({ hotspots = [], underutilized = [] }) {

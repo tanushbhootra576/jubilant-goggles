@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import GlassCard from '../GlassCard';
 
 const SEVERITY_STYLES = {
-    critical: { bg: '#fef2f2', border: '#ef4444', badge: '#ef4444', label: 'Overloaded' },
-    warning: { bg: '#fffbeb', border: '#f59e0b', badge: '#f59e0b', label: 'Congested' }
+    critical: { bg: 'rgba(185,28,28,0.06)', border: '#b91c1c', badge: '#b91c1c', label: 'Overloaded' },
+    warning: { bg: 'rgba(180,83,9,0.06)', border: '#b45309', badge: '#b45309', label: 'Congested' }
 };
 
 const RESOURCE_LABEL = {
@@ -27,8 +27,8 @@ export default function CongestionAlerts({ alerts = [] }) {
                     Congestion Alerts
                 </h3>
                 <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', alignItems: 'center' }}>
-                    <span style={{ fontSize: '0.75rem', fontWeight: 700, background: '#fee2e2', color: '#ef4444', padding: '2px 8px', borderRadius: 12 }}>{criticalCount} Overloaded</span>
-                    <span style={{ fontSize: '0.75rem', fontWeight: 700, background: '#fef3c7', color: '#d97706', padding: '2px 8px', borderRadius: 12 }}>{warningCount} Congested</span>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 700, background: 'rgba(185,28,28,0.1)', color: '#b91c1c', padding: '2px 8px', borderRadius: 12 }}>{criticalCount} Overloaded</span>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 700, background: 'rgba(180,83,9,0.1)', color: '#b45309', padding: '2px 8px', borderRadius: 12 }}>{warningCount} Congested</span>
                     <select value={filter} onChange={e => setFilter(e.target.value)}
                         style={{ padding: '4px 8px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.12)', background: 'rgba(255,255,255,0.8)', fontSize: '0.78rem', cursor: 'pointer' }}>
                         <option value="All">All</option>
