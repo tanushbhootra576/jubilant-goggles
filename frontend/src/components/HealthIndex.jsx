@@ -22,9 +22,9 @@ export default function HealthIndex({ wards = [] }) {
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Score</div>
                 </div>
                 <div style={{ fontSize: '0.85rem' }}>
-                    <div><span style={{ color: 'var(--success)' }}>●</span> Good: 80-100</div>
-                    <div><span style={{ color: 'var(--warning)' }}>●</span> Fair: 60-79</div>
-                    <div><span style={{ color: 'var(--critical)' }}>●</span> Poor: &lt;60</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><svg width="10" height="10" viewBox="0 0 24 24" fill="var(--success)"><circle cx="12" cy="12" r="10"></circle></svg> Good: 80-100</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><svg width="10" height="10" viewBox="0 0 24 24" fill="var(--warning)"><circle cx="12" cy="12" r="10"></circle></svg> Fair: 60-79</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><svg width="10" height="10" viewBox="0 0 24 24" fill="var(--critical)"><circle cx="12" cy="12" r="10"></circle></svg> Poor: &lt;60</div>
                 </div>
             </div>
         </GlassCard>
