@@ -1,14 +1,21 @@
 :root {
-    --bg-main: #f8fafc;
+    --bg-main: #f1f5f9;
     --bg-secondary: #ffffff;
-    --bg-card: rgba(255, 255, 255, 0.75);
-    --border-color: rgba(0, 0, 0, 0.08);
-    --accent-primary: #2563eb;
-    --success: #22c55e;
-    --warning: #f59e0b;
-    --critical: #ef4444;
-    --text-primary: #1e293b;
+    --bg-card: rgba(255, 255, 255, 0.82);
+    --border-color: rgba(15, 23, 42, 0.07);
+    --accent-primary: #1e40af;
+    --accent-light: #3b82f6;
+    --accent-muted: #eff6ff;
+    --success: #15803d;
+    --success-bg: #f0fdf4;
+    --warning: #b45309;
+    --warning-bg: #fffbeb;
+    --critical: #b91c1c;
+    --critical-bg: #fef2f2;
+    --neutral: #64748b;
+    --text-primary: #0f172a;
     --text-secondary: #475569;
+    --text-muted: #94a3b8;
 }
 
 * {

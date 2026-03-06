@@ -10,7 +10,7 @@ const ZONE_FACTOR = { North: 0.55, South: 0.70, East: 0.85, West: 0.45, Central:
 function randomBetween(a, b) { return Math.random() * (b - a) + a; }
 function clamp(v, max = 130) { return Math.max(0, Math.min(max, v)); }
 
-function createWards(count = 100) {
+function createWards(count = 10) {
     const wards = [];
     for (let i = 0; i < count; i++) {
         const zone = ZONES[i % ZONES.length];
@@ -36,7 +36,11 @@ function createWards(count = 100) {
 }
 
 async function start({ io, PredictionService, AIService, Ward: WardModel, SensorReading: SensorModel }) {
-    let wards = createWards(100);
+    let wards = createWards(10);
+
+    // Remove any wards beyond the current set (cleanup when count changes)
+    const activeIds = wards.map(w => w.wardId);
+    await WardModel.deleteMany({ wardId: { $nin: activeIds } });
 
     await Promise.all(wards.map(w =>
         WardModel.updateOne({ wardId: w.wardId }, { $set: { ...w, updatedAt: new Date() } }, { upsert: true })
